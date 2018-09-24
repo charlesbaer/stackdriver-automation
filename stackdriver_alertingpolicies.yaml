@@ -1,0 +1,83 @@
+imports:
+- path: stackdriver_alertingpolicies.jinja
+resources:
+- name: create_alertingpolicies
+  type: stackdriver_alertingpolicies.jinja
+  properties:
+    notificationEmails:
+    - emailAddress: website-oncall@example.com
+      displayName: "Website Oncall" 
+    - emailAddress: support-website@example.com
+      displayName: "Website Support"  
+    policies:
+    - name: "1 - Availability - Google Cloud HTTP/S Load Balancing Rule - Request count (filtered) [COUNT]"   
+      conditions: 
+      - filter: "metric.type=\"loadbalancing.googleapis.com/https/request_count\" resource.type=\"https_lb_rule\" metric.label.response_code!=\"200\"" 
+        comparison: "COMPARISON_GT"
+        duration: "60s" 
+        thresholdValue: 1 
+        trigger:
+          count: 1
+        aggregations:
+        - alignmentPeriod: "60s"
+          perSeriesAligner: "ALIGN_RATE"
+          crossSeriesReducer: "REDUCE_COUNT"
+        displayName: "Google Cloud HTTP/S Load Balancing Rule - Request count (filtered) [COUNT]"
+      documentation:
+        content: "The load balancer rule ${condition.display_name} has generated this alert for the ${metric.display_name}."
+    - name: "2 - Latency - Google Cloud HTTP/S Load Balancing Rule - Total Latency (filtered) [99 percentile]"   
+      conditions: 
+      - filter: "metric.type=\"loadbalancing.googleapis.com/https/total_latencies\" resource.type=\"https_lb_rule\" resource.label.url_map_name=\"web-map\"" 
+        comparison: "COMPARISON_GT"
+        duration: "60s" 
+        thresholdValue: 100 
+        trigger:
+          count: 1
+        aggregations:
+        - alignmentPeriod: "60s"
+          perSeriesAligner: "ALIGN_PERCENTILE_99"
+        displayName: "Google Cloud HTTP/S Load Balancing Rule - Total Latency (filtered) [99 percentile]"
+      documentation:
+        content: "The load balancer rule ${condition.display_name} has generated this alert for the ${metric.display_name}."
+    - name: "3 - Latency - Google Cloud HTTP/S Load Balancing Rule - Frontend Latency (filtered) [99 percentile]"   
+      conditions: 
+      - filter: "metric.type=\"loadbalancing.googleapis.com/https/frontend_tcp_rtt\" resource.type=\"https_lb_rule\" resource.label.url_map_name=\"web-map\"" 
+        comparison: "COMPARISON_GT"
+        duration: "60s" 
+        thresholdValue: 50
+        trigger:
+          count: 1
+        aggregations:
+        - alignmentPeriod: "60s"
+          perSeriesAligner: "ALIGN_PERCENTILE_99"
+        displayName: "Google Cloud HTTP/S Load Balancing Rule - Frontend Latency (filtered) [99 percentile]"
+      documentation:
+        content: "The load balancer rule ${condition.display_name} has generated this alert for the ${metric.display_name}."
+    - name: "4 - Latency - Google Cloud HTTP/S Load Balancing Rule - Backend Latency (filtered) [99 percentile]"   
+      conditions: 
+      - filter: "metric.type=\"loadbalancing.googleapis.com/https/backend_latencies\" resource.type=\"https_lb_rule\" resource.label.url_map_name=\"web-map\"" 
+        comparison: "COMPARISON_GT"
+        duration: "60s" 
+        thresholdValue: 50
+        trigger:
+          count: 1
+        aggregations:
+        - alignmentPeriod: "60s"
+          perSeriesAligner: "ALIGN_PERCENTILE_99"
+        displayName: "Google Cloud HTTP/S Load Balancing Rule - Frontend Latency (filtered) [99 percentile]"
+      documentation:
+        content: "The load balancer rule ${condition.display_name} has generated this alert for the ${metric.display_name}."
+    - name: "5 - Volume - Google Cloud HTTP/S Load Balancing Rule - Request count (filtered) [COUNT]"   
+      conditions: 
+      - filter: "metric.type=\"loadbalancing.googleapis.com/https/request_count\" resource.type=\"https_lb_rule\" resource.label.url_map_name=\"web-map\"" 
+        comparison: "COMPARISON_GT"
+        duration: "60s" 
+        thresholdValue: 100
+        trigger:
+          count: 1
+        aggregations:
+        - alignmentPeriod: "60s"
+          perSeriesAligner: "ALIGN_RATE"
+        displayName: "Google Cloud HTTP/S Load Balancing Rule - Request Count(filtered) [COUNT]"
+      documentation:
+        content: "The load balancer rule ${condition.display_name} has generated this alert for the ${metric.display_name}."

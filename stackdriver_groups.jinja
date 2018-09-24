@@ -1,0 +1,9 @@
+resources:
+- name:  {{ env["name"] }}
+  type: gcp-types/monitoring-v3:projects.groups 
+  properties:
+    name: "projects/{{ env["project"] }}"
+    displayName: {{ properties["group_display_name"] }}
+    parentName: "{{ properties["group_parent_name"] }}" 
+    filter: {{ properties["group_filter"] }}
+    isCluster: {{ properties["group_is_cluster"] }}

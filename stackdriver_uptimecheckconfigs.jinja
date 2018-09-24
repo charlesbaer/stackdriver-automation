@@ -1,0 +1,16 @@
+{% set PREFIX = env["deployment"] %}
+{% set UPTIME_CHECKS = properties["uptimechecks"] %}
+{% set PROJECT = env["project"] %}
+
+resources:
+{% for uptimecheck in UPTIME_CHECKS %}
+- name: {{ PREFIX }}-uptimecheck-{{ loop.index }}
+  type: gcp-types/monitoring-v3:monitoring.projects.uptimeCheckConfigs.create
+  properties:
+    parent: projects/{{ PROJECT }}
+    displayName: {{ uptimecheck.name }}
+    period: {{ uptimecheck.period }}
+    timeout: {{ uptimecheck.timeout }}
+    monitoredResource: {{ uptimecheck.monitoredResource }}
+    httpCheck: {{ uptimecheck.httpCheck }}
+{% endfor %}

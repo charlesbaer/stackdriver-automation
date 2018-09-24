@@ -1,0 +1,30 @@
+imports: 
+- path: stackdriver_groups.jinja
+resources:
+- name: create-apache-group
+  type: stackdriver_groups.jinja 
+  properties:
+    group_display_name: "Apache"
+    group_parent_name: ""
+    group_filter: "metadata.user_labels.app=has_substring(\"website\")"
+    group_is_cluster: false
+- name: create-apache-prod-group
+  type: stackdriver_groups.jinja
+  properties:
+    group_display_name: "prod"
+    group_parent_name: $(ref.create-apache-group.name)
+    group_filter: "metadata.user_labels.env=\"prod\""
+    group_is_cluster: false
+    metadata:
+      dependsOn:
+        create-apache-group
+- name: create-apache-qa-group
+  type: stackdriver_groups.jinja
+  properties:
+    group_display_name: "qa"
+    group_parent_name: $(ref.create-apache-group.name)
+    group_filter: "metadata.user_labels.env=\"qa\""
+    group_is_cluster: false
+    metadata:
+      dependsOn:
+        create-apache-group 

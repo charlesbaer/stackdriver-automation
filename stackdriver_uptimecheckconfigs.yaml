@@ -1,0 +1,22 @@
+imports:
+- path: stackdriver_uptimecheckconfigs.jinja
+resources:
+- name: create_uptimechecks
+  type: stackdriver_uptimecheckconfigs.jinja
+  properties:
+    uptimechecks:
+    - name: "1 - Website uptime check [global]"
+      period: "60s"
+      timeout: "10s"
+      monitoredResource:
+        type: "uptime_url"
+        labels:
+          project_id: YOUR_PROJECT_ID
+          host: "35.241.47.194"
+      httpCheck:
+        path: "/"
+        port: 80    
+
+
+
+

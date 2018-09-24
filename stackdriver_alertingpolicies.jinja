@@ -1,0 +1,47 @@
+{% set PREFIX = env["deployment"] %}
+{% set NOTIFICATION_EMAILS = properties["notificationEmails"] %}
+{% set POLICIES = properties["policies"] %}
+{% set PROJECT = env["project"] %}
+{% set DEFAULT_MIME_TYPE = "text/markdown" %}
+
+resources:
+{% for email in NOTIFICATION_EMAILS %}
+- name: {{ PREFIX }}-email-{{ loop.index }}
+  type: gcp-types/monitoring-v3:projects.notificationChannels
+  properties:
+    name: projects/{{ PROJECT }}
+    type: email
+    displayName: {{ email.displayName }}
+    labels:
+      email_address: {{ email.emailAddress }}
+    enabled: true
+{% endfor %}
+
+{% for policy in POLICIES %}
+- name: {{ PREFIX }}-alertingpolicy-{{ loop.index }}
+  type: gcp-types/monitoring-v3:projects.alertPolicies
+  properties:
+    displayName: {{ PREFIX }}-{{ policy.name }}
+    documentation:
+      content: {{ policy.documentation.content }}
+      mimeType:  {{ DEFAULT_MIME_TYPE }}
+    combiner: OR
+    conditions:
+{% for condition in policy.conditions %}
+    - displayName: {{ condition.displayName }}
+      conditionThreshold:
+        filter: {{ condition.filter }}
+        comparison: {{condition.comparison }}
+        duration: {{ condition.duration }}
+        thresholdValue: {{ condition.thresholdValue }}
+        trigger: {{ condition.trigger }}
+        aggregations: {{ condition.aggregations }}
+{% endfor  %}        
+    notificationChannels:
+{% for notification in NOTIFICATION_EMAILS %}
+    - $(ref.{{ PREFIX }}-email-{{ loop.index }}.name)
+{% endfor %}
+    enabled: true
+{% endfor %}
+
+
